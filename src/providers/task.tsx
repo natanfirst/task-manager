@@ -186,7 +186,7 @@ const TaskProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, tasks, setTasks, updateTaskValue]);
+  }, [supabase, tasks, setTasks, updateTaskValue, getTasks]);
 
   const value = useMemo(
     () => ({
