@@ -1,10 +1,9 @@
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/ui/header";
 import { cn } from "@/lib/utils";
-import { AuthProvider } from "@/providers/auth";
+import Providers from "@/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn("h-full w-full", inter.className)}>
         <div className="h-full w-full">
-          <AuthProvider>
+          <Providers>
             <Header />
             {children}
-          </AuthProvider>
+          </Providers>
         </div>
       </body>
     </html>

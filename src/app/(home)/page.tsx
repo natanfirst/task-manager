@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -9,6 +9,11 @@ import { useEffect } from "react";
 export default function Home() {
   const { status, data } = useSession();
   const router = useRouter();
+
+  const handleLoginClick = async () => {
+    await signIn("google", { callbackUrl: '/dashboard' })
+  };
+
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -35,7 +40,7 @@ export default function Home() {
             Cansado de equilibrar várias listas de afazeres e perder prazos
             importantes? Conheça o Task Manager.
           </p>
-          <Button variant="default">Comece Agora</Button>
+          <Button onClick={() => handleLoginClick()} variant="default">Comece Agora</Button>
         </div>
       </div>
     </main>

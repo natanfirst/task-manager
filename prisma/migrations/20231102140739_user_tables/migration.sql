@@ -53,6 +53,7 @@ CREATE TABLE "Task" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdById" TEXT NOT NULL,
     "assignedToId" TEXT,
+    "status" TEXT NOT NULL,
 
     CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
 );

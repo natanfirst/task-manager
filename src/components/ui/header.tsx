@@ -10,22 +10,23 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { Skeleton } from "./skeleton";
 const Header = () => {
   const { status, data } = useSession();
 
   const handleLoginClick = async () => {
-    await signIn(undefined, { callbackUrl: '/dashboard' })
+    await signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const handleLogoutClick = async () => {
-    await signOut({ callbackUrl: '/' })
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
     <div className="w-full py-2">
       <Card className="">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between border-primary p-[1.875rem] py-5">
-          <h1>Task Manager</h1>
+          <p className="font-bold text-primary">Task Manager</p>
           {status === "authenticated" ? (
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-3">
@@ -46,6 +47,8 @@ const Header = () => {
                 </Button>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : status === "loading" ? (
+            <Skeleton className="h-[30px] w-[100px] rounded-full" />
           ) : (
             <Button
               onClick={() => handleLoginClick()}

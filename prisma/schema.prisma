@@ -61,11 +61,12 @@ model VerificationToken {
 model Task {
   id           Int        @id @default(autoincrement())
   description  String
-  priority     String    
+  priority     String 
   assignee     String?  
   createdAt    DateTime   @default(now())
   createdBy    User       @relation("CreatedBy", fields: [createdById], references: [id])
   createdById  String
   assignedTo   User?      @relation("AssignedTo", fields: [assignedToId], references: [id])
   assignedToId String?
+  status       String     
 }
