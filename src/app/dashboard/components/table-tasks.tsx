@@ -155,7 +155,11 @@ export default function TableTasks() {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger
-                        disabled={task.status === "Concluída"}
+                        disabled={
+                          (task?.createdBy?.id !== user?.id &&
+                            task?.assignedTo?.id !== user?.id) ||
+                          task.status === "Concluída"
+                        }
                         className="flex items-center gap-3"
                       >
                         <span
@@ -251,8 +255,8 @@ export default function TableTasks() {
             </TableBody>
           </Table>
         ) : (
-          <div className="py-5 flex flex-col items-center">
-            <ListChecks color="white" size={32}/>
+          <div className="flex flex-col items-center py-5">
+            <ListChecks color="white" size={32} />
             <p className="text-center"> Sem tarefas encontradas</p>
           </div>
         )}
