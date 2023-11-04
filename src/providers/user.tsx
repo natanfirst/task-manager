@@ -1,5 +1,6 @@
 "use client";
 
+import { supabase } from "@/lib/supabase";
 import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import {
@@ -7,6 +8,7 @@ import {
   createContext,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -32,12 +34,31 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [data]);
 
+
+  useEffect(() => {
+    const roomOne = supabase.channel("room_01");
+    roomOne
+      .on("presence", { event: "sync" }, () => {
+      })
+      .on("presence", { event: "join" }, ({ key, newPresences }) => {
+      })
+      .on("presence", { event: "leave" }, ({ key, leftPresences }) => {
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(roomOne);
+    };
+  }, [supabase]);
+
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
+  const value = useMemo(() => ({ user }),[user])
+
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={value}>{children}</UserContext.Provider>
   );
 };
 

@@ -26,7 +26,7 @@ export default function Home() {
       <div className="relative mx-auto h-[calc(100vh-100px)] w-full">
         <Image
           className="h-full w-full"
-          src="/hero-image.jpg"
+          src="/hero-image.webp"
           sizes="100vw"
           width={1240}
           height={800}

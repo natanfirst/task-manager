@@ -5,8 +5,12 @@ export const POST = async (req: Request) => {
   try {
     const { description, priority, assignee, createdById } = await req.json();
 
-    if (!description) {
-      return NextResponse.json("Descrição é obrigatória.", { status: 400 });
+    if (!description || description.trim() === "") {
+      return NextResponse.json("A descrição é obrigatória.", { status: 400 });
+    }
+
+    if (priority && !["Alta", "Média", "Baixa"].includes(priority)) {
+      return NextResponse.json("A prioridade é inválida.", { status: 400 });
     }
 
     const response = await prismaClient.task.create({
@@ -30,12 +34,19 @@ export const POST = async (req: Request) => {
 };
 
 export const GET = async () => {
-  const response = await prismaClient.task.findMany({
-    include: {
-      createdBy: true,
-      assignedTo: true,
-    }
-  });
+  try {
+    const response = await prismaClient.task.findMany({
+      include: {
+        createdBy: true,
+        assignedTo: true,
+      }
+    });
 
-  return NextResponse.json(response);
+    return NextResponse.json(response);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Ocorreu um erro ao buscar as tarefas." },
+      { status: 500 },
+    );
+  }
 };

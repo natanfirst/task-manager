@@ -31,18 +31,25 @@ import { UserContext } from "@/providers/user";
 import { getInitials } from "@/utils/getInitials";
 import { switchPriority } from "@/utils/switchPriority";
 import { switchStatus } from "@/utils/switchStatus";
-import { TrashIcon } from "lucide-react";
+import { ListChecks, TrashIcon } from "lucide-react";
 import moment from "moment";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import EditTask from "./edit-task";
 
 export default function TableTasks() {
   const { user } = useContext(UserContext);
   const { status } = useSession();
   const router = useRouter();
-  const { tasks, getTasks, deleteTask, updateTaskStatus, listLoad } =
-    useContext(TaskContext);
+  const {
+    tasks,
+    getTasks,
+    deleteTask,
+    updateTaskStatus,
+    listLoad,
+    setCurrentTask,
+  } = useContext(TaskContext);
   const [selectedPriority, setSelectedPriority] = useState("Todas");
   const [selectedStatus, setSelectedStatus] = useState("Todas");
 
@@ -70,22 +77,19 @@ export default function TableTasks() {
     return false;
   };
 
+  const priorityOrder: { [key: string]: number } = {
+    Alta: 1,
+    Média: 2,
+    Baixa: 3,
+  };
+
   const sortedTasks = tasks?.sort((a, b) => {
-    const priorityOrder: { [key: string]: number } = {
-      Alta: 1,
-      Média: 2,
-      Baixa: 3,
-    };
     return priorityOrder[a.priority] - priorityOrder[b.priority];
   });
 
   const filteredTasks = sortedTasks
     ?.filter(filterByPriority)
     .filter(filterByStatus);
-
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
 
   return (
     <div>
@@ -119,7 +123,7 @@ export default function TableTasks() {
               <Skeleton key={key} className="h-10 w-full" />
             ))}
           </div>
-        ) : (
+        ) : filteredTasks.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
@@ -204,8 +208,7 @@ export default function TableTasks() {
                               <AvatarImage src={task.assignedTo?.image} />
                             )}
                             <AvatarFallback>
-                              {task.assignedTo?.name?.[0]}
-                              {task.assignedTo?.name?.[0]}
+                              {getInitials(task?.assignedTo?.name || "User")}
                             </AvatarFallback>
                           </Avatar>
                           <span className="hidden lg:block">
@@ -221,19 +224,37 @@ export default function TableTasks() {
                     <span>{moment(task.createdAt).format("DD/MM/YYYY")}</span>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-end">
-                      {(task?.createdBy?.id === user?.id ||
-                        task?.assignedTo?.id === user?.id) && (
-                        <button onClick={() => deleteTask(task.id)}>
-                          <TrashIcon size={16} color="red" />
-                        </button>
-                      )}
+                    <div className="flex items-center justify-end gap-3">
+                      <div className="flex items-center justify-end">
+                        {(task?.createdBy?.id === user?.id ||
+                          task?.assignedTo?.id === user?.id) && (
+                          <EditTask
+                            handleOpen={() => {
+                              setCurrentTask(task);
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-end">
+                        {(task?.createdBy?.id === user?.id ||
+                          task?.assignedTo?.id === user?.id) &&
+                          task.status !== "Concluída" && (
+                            <button onClick={() => deleteTask(task.id)}>
+                              <TrashIcon size={16} color="red" />
+                            </button>
+                          )}
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        ) : (
+          <div className="py-5 flex flex-col items-center">
+            <ListChecks color="white" size={32}/>
+            <p className="text-center"> Sem tarefas encontradas</p>
+          </div>
         )}
       </Card>
     </div>

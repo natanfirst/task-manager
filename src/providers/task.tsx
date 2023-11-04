@@ -22,7 +22,10 @@ interface ITaskContext {
   tasks: TaskResponse[];
   deleteTask: (taskId: number) => Promise<void>;
   updateTaskStatus: (id: number, status: string) => Promise<void>;
-  listLoad: boolean
+  listLoad: boolean;
+  currentTask: TaskResponse | null;
+  setCurrentTask: React.Dispatch<React.SetStateAction<TaskResponse | null>>;
+  updateTask: (id: number, body: UpdateBody) => Promise<void>;
 }
 
 export const TaskContext = createContext<ITaskContext>({
@@ -38,12 +41,16 @@ export const TaskContext = createContext<ITaskContext>({
   getTasks: async () => {},
   tasks: [],
   deleteTask: async () => {},
+  updateTask: async () => {},
   updateTaskStatus: async () => {},
-  listLoad: false
+  listLoad: false,
+  currentTask: null,
+  setCurrentTask: async () => {},
 });
 
 const TaskProvider = ({ children }: { children: ReactNode }) => {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
+  const [currentTask, setCurrentTask] = useState<TaskResponse | null>(null);
   const [assignee, setAssignee] = useState<User | null>(null);
   const [listLoad, setListLoad] = useState(false);
   const [body, setBody] = useState<CreateBody>({
@@ -94,20 +101,20 @@ const TaskProvider = ({ children }: { children: ReactNode }) => {
       const response = await fetch(`/api/task/${taskId}`);
       const data = await response.json();
       setTasks((prev) => {
-        const state = [...prev];
-        const taskExists = state.find((item) => item.id === taskId);
-        state?.forEach((item) => {
+  
+        const updatedTasks = prev.map((item) => {
           if (item.id === taskId) {
-            item = data;
+            return data;
           }
+          return item; 
         });
-        if (!taskExists) {
-          return [...state, data];
-        }
-        return state;
+  
+        return prev.some((item) => item.id === taskId) ? updatedTasks : [...prev, data];
       });
-    } catch (error) {}
-  }, []);
+    } catch (error) {
+    }
+  }, [setTasks]);
+  
 
   const getTasks = useCallback(async () => {
     setListLoad(true);
@@ -136,6 +143,18 @@ const TaskProvider = ({ children }: { children: ReactNode }) => {
     [tasks],
   );
 
+  const updateTask = useCallback(async (id: number, body: UpdateBody ) => {
+    try {
+      await fetch(`/api/task/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+    } catch (error) {}
+  }, []);
+
   const updateTaskStatus = useCallback(async (id: number, status: string) => {
     try {
       await fetch(`/api/task/${id}`, {
@@ -159,27 +178,18 @@ const TaskProvider = ({ children }: { children: ReactNode }) => {
           table: "Task",
         },
         (payload) => {
-          getTasks();
           if (payload.eventType === "DELETE") {
-            toast.success("Tarefa Excluída");
+            setTasks([...tasks.filter((item) => item.id !== payload.old.id)]);
+            toast.success('Tarefa Deletada!')
           }
           if (payload.eventType === "UPDATE") {
-            toast.success("Tarefa Atualizada");
+            updateTaskValue(payload.new.id);
+            toast.success('Tarefa atualizada !')
           }
           if (payload.eventType === "INSERT") {
+            updateTaskValue(payload.new.id);
             toast.success("Nova tarefa adicionada !");
           }
-          //  if( payload.eventType === 'DELETE') {
-          //   setTasks([...tasks.filter((item) => item.id !== payload.old.id)]);
-          //   console.log(payload);
-          //  }
-          //  if( payload.eventType === 'UPDATE') {
-          //   updateTaskValue(payload.new.id)
-          //  }
-          //  if( payload.eventType === 'INSERT') {
-          //   updateTaskValue(payload.new.id)
-          //   toast.success('Nova tarefa adicionada !')
-          //  }
         },
       )
       .subscribe();
@@ -199,9 +209,24 @@ const TaskProvider = ({ children }: { children: ReactNode }) => {
       tasks,
       deleteTask,
       updateTaskStatus,
-      listLoad
+      listLoad,
+      currentTask,
+      setCurrentTask,
+      updateTask
     }),
-    [assignee, body, createTask, getTasks, tasks, deleteTask, updateTaskStatus, listLoad],
+    [
+      assignee,
+      body,
+      createTask,
+      getTasks,
+      tasks,
+      deleteTask,
+      updateTaskStatus,
+      listLoad,
+      currentTask,
+      setCurrentTask,
+      updateTask
+    ],
   );
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
@@ -217,7 +242,14 @@ interface CreateBody {
   assignee: string;
 }
 
+interface UpdateBody {
+  description: string;
+  priority: string;
+  assignee: string | null;
+  status: string;
+}
+
 export interface TaskResponse extends Task {
   createdBy: User;
-  assignedTo: User;
+  assignedTo: User | null;
 }

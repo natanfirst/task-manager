@@ -6,7 +6,7 @@ export const GET = async (
   { params }: { params: { email: string } },
 ) => {
   const email = params.email;
-  const user = await prismaClient.user.findFirst({
+  const user = await prismaClient.user.findUnique({
     where: {
       email: email,
     },
