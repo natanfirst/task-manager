@@ -138,6 +138,7 @@ const TaskProvider = ({ children }: { children: ReactNode }) => {
           },
         });
         setTasks([...tasks.filter((item) => item.id !== taskId)]);
+        toast.success('Tarefa Deletada!')
       } catch (error) {}
     },
     [tasks],
