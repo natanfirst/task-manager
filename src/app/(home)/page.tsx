@@ -32,11 +32,11 @@ export default function Home() {
           height={800}
           alt={"co-working"}
         />
-        <div className="absolute left-0 top-0 z-10  flex h-full w-full flex-col items-center justify-center gap-6 bg-black bg-opacity-90">
-          <h2 className="max-w-[500px] text-center text-6xl font-bold">
+        <div className="absolute left-0 top-0 z-10  flex h-full w-full flex-col items-center justify-center gap-6 bg-black bg-opacity-90 px-4 lg:px-0">
+          <h2 className="max-w-[500px] text-center text-3xl lg:text-6xl font-bold">
             Gerencie suas Tarefas
           </h2>
-          <p className=" max-w-[500px] text-center">
+          <p className=" max-w-[500px] text-center text-sm lg:text-base">
             Cansado de equilibrar várias listas de afazeres e perder prazos
             importantes? Conheça o Task Manager.
           </p>
