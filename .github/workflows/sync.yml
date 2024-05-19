@@ -3,7 +3,7 @@ name: Sync Repositories
 on:
   push:
     branches:
-      - main 
+      - main
       - develop
 
 jobs:
@@ -13,9 +13,6 @@ jobs:
     steps:
       - name: Checkout source repo
         uses: actions/checkout@v3
-        with:
-          repository: natanfirst/task-manager
-          GH_PAT: ${{ secrets.GH_PAT }}
 
       - name: Sync src/common to target repos
         uses: Redocly/repo-file-sync-action@main
