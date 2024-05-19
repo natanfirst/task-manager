@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -15,10 +16,5 @@ jobs:
       - name: Sync src/common to target repos
         uses: Redocly/repo-file-sync-action@main
         with:
-          source_repo: natanfirst/task-manager
-          source_folder: src/common
-          destination_repos: |
-            natanfirst/ecommerce-app/src
-            natanfirst/mks-store-challenge/src
           GH_PAT: ${{ secrets.GH_PAT }}
-          commit_message: "Sync src/common folder from task-manager"
+          CONFIG_PATH: .github/sync.yml
