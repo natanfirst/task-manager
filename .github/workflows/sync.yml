@@ -1,0 +1,29 @@
+name: Sync Repositories
+
+on:
+  push:
+    branches:
+      - main 
+      - develop
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v3
+        with:
+          repository: natanfirst/task-manager
+          GH_PAT: ${{ secrets.GH_PAT }}
+
+      - name: Sync src/common to target repos
+        uses: Redocly/repo-file-sync-action@main
+        with:
+          source_repo: natanfirst/task-manager
+          source_folder: src/common
+          destination_repos: |
+            natanfirst/ecommerce-app/src
+            natanfirst/mks-store-challenge/src
+          GH_PAT: ${{ secrets.GH_PAT }}
+          commit_message: "Sync src/common folder from task-manager"
