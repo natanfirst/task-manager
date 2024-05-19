@@ -1,0 +1,7 @@
+natanfirst/ecommerce-app:
+  - source: src/common
+    dest: src/common
+
+natanfirst/mks-store-challenge:
+  - source: src/common
+    dest: src/common
