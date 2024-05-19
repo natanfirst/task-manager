@@ -1,5 +1,5 @@
 
 export function repoSyncTest() {
 
- return 'test'
+ return 'gh pat'
 }
