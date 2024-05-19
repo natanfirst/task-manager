@@ -1,4 +1,5 @@
 
 export function repoSyncTest() {
- return 'ok'
+
+ return 'test'
 }
